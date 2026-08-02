@@ -1,0 +1,16 @@
+services:
+  code-server:
+    build: .
+    container_name: vscode-claude
+    restart: unless-stopped
+    command: --bind-addr 0.0.0.0:8080 /home/coder/project
+    environment:
+      - PASSWORD=${CODE_SERVER_PASSWORD}
+    volumes:
+      - coder-home:/home/coder
+      - /mnt/dev-workspace:/home/coder/project
+    ports:
+      - "8080:8080"
+
+volumes:
+  coder-home:
