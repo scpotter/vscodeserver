@@ -51,7 +51,7 @@ image change reaches a running deployment.
 3. Create a Universal Auth machine identity in Infisical, read-only and
    scoped to that one path, and place its client ID/secret at
    `~/.secrets/infisical.env` (untracked, never in this repo) as
-   `VSCODE_HOST_CLIENT_ID` / `VSCODE_HOST_CLIENT_SECRET`.
+   `VSCODEHOST_CLIENT_ID` / `VSCODEHOST_CLIENT_SECRET`.
 4. Run `./launch.sh`. It sources `host_config.env`, logs into Infisical,
    pulls the password, and brings the container up with
    `docker compose up -d --build`.

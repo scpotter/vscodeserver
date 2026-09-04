@@ -22,8 +22,8 @@ source ~/.secrets/infisical.env
 export INFISICAL_TOKEN
 INFISICAL_TOKEN=$(infisical login \
   --method=universal-auth \
-  --client-id="${VSCODE_HOST_CLIENT_ID}" \
-  --client-secret="${VSCODE_HOST_CLIENT_SECRET}" \
+  --client-id="${VSCODEHOST_CLIENT_ID}" \
+  --client-secret="${VSCODEHOST_CLIENT_SECRET}" \
   --domain="${INFISICAL_API_URL}" \
   --silent --plain)
 
