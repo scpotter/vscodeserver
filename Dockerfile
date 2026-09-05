@@ -2,6 +2,7 @@ FROM codercom/code-server:latest
 
 USER root
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates gnupg apt-transport-https shellcheck && curl -1sLf 'https://artifacts-cli.infisical.com/setup.deb.sh' | bash && apt-get update && apt-get install -y --no-install-recommends infisical && rm -rf /var/lib/apt/lists/*
+RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin INSTALLER_NO_MODIFY_PATH=1 sh
 
 USER coder
 WORKDIR /home/coder
