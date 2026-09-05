@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     command: --bind-addr 0.0.0.0:8080 /home/coder/repos
     environment:
-      - PASSWORD=${CODE_SERVER_PASSWORD}
+      - PASSWORD=${PASSWORD}
     volumes:
       - coder-home:/home/coder
     ports:
