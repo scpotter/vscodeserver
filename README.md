@@ -63,12 +63,26 @@ it recreates that container on every build.
 
 This repo doesn't care where `host_config.env`'s values come from — hardcode
 them by hand, or generate the file from your own private config store before
-calling `launch.sh`. Either way, `launch.sh` only ever sees the two bare
+calling `launch.sh`. Either way, `launch.sh` only ever sees the bare
 variables in `.env.example`:
 
 - `INFISICAL_API_URL` — your self-hosted (or cloud) Infisical instance.
 - `CORE_INFRA_PROJECT_ID` — the project ID (UUID) holding
   `/vscode/code-server/TOKEN_SECRET`.
+- `HOST_SHARE_DIR` (optional) — a host directory to mount read-only in the
+  container; see below.
+
+## Optional read-only host directory
+
+Compose mounts a host directory into the container, read-only, at
+`/mnt/host-share`. By default that is the empty `./host-share` directory in
+this repo, which does nothing. Set `HOST_SHARE_DIR` in `host_config.env` to
+point it at a directory of your own — for example a tmpfs directory under
+`/run` that a host-side process renders files into — and the container can read
+them but never change them. The directory must exist before the container
+starts (otherwise Docker creates it owned by root), and the files in it must be
+readable by the container's `coder` user (uid 1000). The mount takes effect
+when `launch.sh` recreates the container.
 
 ## Network exposure
 

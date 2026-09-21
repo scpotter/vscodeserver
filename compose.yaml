@@ -8,6 +8,9 @@ services:
       - PASSWORD=${PASSWORD}
     volumes:
       - coder-home:/home/coder
+      # Optional read-only host directory (see .env.example: HOST_SHARE_DIR).
+      # Unset, this mounts the empty ./host-share and does nothing.
+      - ${HOST_SHARE_DIR:-./host-share}:/mnt/host-share:ro
     ports:
       - "8080:8080"
 
