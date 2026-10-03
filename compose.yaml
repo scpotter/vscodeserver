@@ -3,6 +3,7 @@ services:
     build: .
     container_name: vscode-claude
     restart: unless-stopped
+    network_mode: host
     command: --bind-addr 0.0.0.0:8080 /home/coder/repos
     environment:
       - PASSWORD=${PASSWORD}
@@ -11,8 +12,6 @@ services:
       # Optional read-only host directory (see .env.example: HOST_SHARE_DIR).
       # Unset, this mounts the empty ./host-share and does nothing.
       - ${HOST_SHARE_DIR:-./host-share}:/mnt/host-share:ro
-    ports:
-      - "8080:8080"
 
 volumes:
   coder-home:
