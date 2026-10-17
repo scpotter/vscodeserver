@@ -8,7 +8,9 @@ services:
     environment:
       - PASSWORD=${PASSWORD}
     volumes:
-      - coder-home:/home/coder
+      # The persistent home. Defaults to the named volume below; set
+      # CODER_HOME_DIR to a host directory to keep it there instead (see README).
+      - ${CODER_HOME_DIR:-coder-home}:/home/coder
       # Optional read-only host directory (see .env.example: HOST_SHARE_DIR).
       # Unset, this mounts the empty ./host-share and does nothing.
       - ${HOST_SHARE_DIR:-./host-share}:/mnt/host-share:ro

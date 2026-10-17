@@ -71,6 +71,8 @@ variables in `.env.example`:
   `/vscode/code-server/TOKEN_SECRET`.
 - `HOST_SHARE_DIR` (optional) — a host directory to mount read-only in the
   container; see below.
+- `CODER_HOME_DIR` (optional) — a host directory to hold the container's home
+  instead of the `coder-home` named volume; see below.
 
 ## Optional read-only host directory
 
@@ -83,6 +85,23 @@ them but never change them. The directory must exist before the container
 starts (otherwise Docker creates it owned by root), and the files in it must be
 readable by the container's `coder` user (uid 1000). The mount takes effect
 when `launch.sh` recreates the container.
+
+## Optional host directory for the home
+
+The container's home, `/home/coder` — Claude Code's login and settings, SSH
+keys, your clones — persists across rebuilds. By default it lives in the
+`coder-home` named volume. Set `CODER_HOME_DIR` in `host_config.env` to a host
+directory to keep it there instead, for example so a host-side process can
+write into your workspace; a named volume lives under `/var/lib/docker`, which
+only root can traverse.
+
+The directory must exist before the container starts and be owned by the
+container's `coder` user (uid 1000). Unlike an empty named volume, a host
+directory never receives the files the image puts under `/home/coder`, so on an
+empty directory install Claude Code into the home yourself
+(`curl -fsSL https://claude.ai/install.sh | bash` inside the container). To move
+an existing home, stop the container and copy the volume's contents across with
+owners, modes and links preserved before the first start.
 
 ## Network exposure
 
