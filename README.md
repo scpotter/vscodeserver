@@ -124,9 +124,11 @@ Settings, all in `host_config.env`:
   (toolchains and build output), default `./espdb-data`. Create both before the
   first start, owned by uid 1000; otherwise Docker creates them owned by root and
   the service cannot write to them.
-- `ESPDB_TRUSTED_DOMAINS` — comma-separated hostnames the dashboard accepts in the
-  `Host` header. List names, not addresses, so a changed IP does not lock you out.
-  A request addressed by a name or IP that is not listed is rejected.
+- `ESPDB_TRUSTED_DOMAINS` (optional) — comma-separated hostnames. Left empty, the
+  default, the Device Builder does not restrict the `Host` header. When set, it
+  rejects browser requests whose `Host` header is not listed (a defense against DNS
+  rebinding), by exact name or IP; command-line and integration clients are not
+  affected. List names, not addresses, so a changed IP does not lock you out.
 - The dashboard login: set `ESPHOME_USERNAME` and `ESPHOME_PASSWORD` yourself, or
   let `launch.sh` fetch them from Infisical with `ESPDB_SECRET_PATH` (a folder in
   the project named by `SMARTHOME_SELFHOSTED_PROJECT_ID`) and the key names
