@@ -15,5 +15,33 @@ services:
       # Unset, this mounts the empty ./host-share and does nothing.
       - ${HOST_SHARE_DIR:-./host-share}:/mnt/host-share:ro
 
+  # Optional ESPHome Device Builder dashboard, off unless the `espdb` profile is
+  # enabled (COMPOSE_PROFILES=espdb; see README). It builds from the same working
+  # tree the editor uses, at the same path, so unpushed edits build.
+  espdb:
+    profiles: ["espdb"]
+    image: ghcr.io/esphome/esphome:${ESPDB_VERSION:-latest}
+    container_name: espdb
+    restart: unless-stopped
+    # Host networking, for the same reason as code-server: device discovery
+    # needs raw multicast, which a bridge never forwards. The dashboard listens
+    # on 6052 and the remote-build peer link on 6055.
+    network_mode: host
+    # The image sets no user and has no passwd entry for 1000, so HOME points
+    # at the writable /cache mount.
+    user: "1000:1000"
+    command: ["dashboard", "${ESPDB_CONFIG_DIR:-/home/coder/repos/esphome}"]
+    environment:
+      - HOME=/cache
+      - ESPHOME_USERNAME=${ESPHOME_USERNAME:-}
+      - ESPHOME_PASSWORD=${ESPHOME_PASSWORD:-}
+      - ESPHOME_TRUSTED_DOMAINS=${ESPDB_TRUSTED_DOMAINS:-}
+    volumes:
+      - ${CODER_HOME_DIR:-coder-home}:/home/coder
+      # Toolchains and PlatformIO (/cache) and build output (/build). Host
+      # directories owned by uid 1000, created before first start.
+      - ${ESPDB_DATA_DIR:-./espdb-data}/cache:/cache
+      - ${ESPDB_DATA_DIR:-./espdb-data}/build:/build
+
 volumes:
   coder-home:

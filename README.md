@@ -73,6 +73,8 @@ variables in `.env.example`:
   container; see below.
 - `CODER_HOME_DIR` (optional) — a host directory to hold the container's home
   instead of the `coder-home` named volume; see below.
+- `COMPOSE_PROFILES`, `ESPDB_*` (optional) — the ESPHome Device Builder service;
+  see below.
 
 ## Optional read-only host directory
 
@@ -102,6 +104,38 @@ empty directory install Claude Code into the home yourself
 (`curl -fsSL https://claude.ai/install.sh | bash` inside the container). To move
 an existing home, stop the container and copy the volume's contents across with
 owners, modes and links preserved before the first start.
+
+## Optional ESPHome Device Builder
+
+A second service, `espdb`, runs the ESPHome Device Builder dashboard beside the
+editor. It is off unless the `espdb` compose profile is enabled
+(`COMPOSE_PROFILES=espdb` in `host_config.env`). It builds from the working tree
+the editor uses, mounted at the same path, so edits you have not pushed build. Like
+code-server it uses host networking, because device discovery needs multicast; the
+dashboard listens on 6052 and the remote-build peer link on 6055.
+
+Settings, all in `host_config.env`:
+
+- `ESPDB_VERSION` — the ESPHome release, used as the image tag. Pin it; the
+  default is `latest`.
+- `ESPDB_CONFIG_DIR` — the configuration directory, default
+  `/home/coder/repos/esphome`.
+- `ESPDB_DATA_DIR` — a host directory holding `cache` and `build` subdirectories
+  (toolchains and build output), default `./espdb-data`. Create both before the
+  first start, owned by uid 1000; otherwise Docker creates them owned by root and
+  the service cannot write to them.
+- `ESPDB_TRUSTED_DOMAINS` — comma-separated hostnames the dashboard accepts in the
+  `Host` header. List names, not addresses, so a changed IP does not lock you out.
+  A request addressed by a name or IP that is not listed is rejected.
+- The dashboard login: set `ESPHOME_USERNAME` and `ESPHOME_PASSWORD` yourself, or
+  let `launch.sh` fetch them from Infisical with `ESPDB_SECRET_PATH` (a folder in
+  the project named by `SMARTHOME_SELFHOSTED_PROJECT_ID`) and the key names
+  `ESPDB_USERNAME_KEY` / `ESPDB_PASSWORD_KEY` (default `TOKEN_NAME` /
+  `TOKEN_SECRET`). `launch.sh` loads only those two keys and never prints them.
+
+The Device Builder can commit to a git working tree it manages. If you edit the
+same tree in the editor, turn its version history off in its settings before you
+make any edit.
 
 ## Network exposure
 

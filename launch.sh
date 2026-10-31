@@ -43,5 +43,33 @@ eval "$VSCODE_SECRETS"
 # it with); compose expects PASSWORD.
 export PASSWORD="${TOKEN_SECRET}"
 
+# Optional: the ESPDB service's dashboard login (compose profile `espdb`).
+# Skipped unless ESPDB_SECRET_PATH is set. The folder it names holds the login
+# under key names given by ESPDB_USERNAME_KEY / ESPDB_PASSWORD_KEY (default
+# TOKEN_NAME / TOKEN_SECRET). Only those two keys are loaded into this process,
+# whatever else the folder holds, and neither value is ever printed.
+if [[ -n "${ESPDB_SECRET_PATH:-}" ]]; then
+  : "${ESPDB_USERNAME_KEY:=TOKEN_NAME}"
+  : "${ESPDB_PASSWORD_KEY:=TOKEN_SECRET}"
+  # Captured first, so a failed export trips `set -e` instead of starting the
+  # service with an empty login.
+  ESPDB_FOLDER=$(infisical export \
+    --domain="${INFISICAL_API_URL}" \
+    --projectId="${SMARTHOME_SELFHOSTED_PROJECT_ID}" \
+    --env=prod \
+    --path="${ESPDB_SECRET_PATH}" \
+    --format=dotenv-export)
+  eval "$(printf '%s\n' "${ESPDB_FOLDER}" |
+    grep -E "^export (${ESPDB_USERNAME_KEY}|${ESPDB_PASSWORD_KEY})=")"
+  unset ESPDB_FOLDER
+  if [[ -z "${!ESPDB_USERNAME_KEY:-}" || -z "${!ESPDB_PASSWORD_KEY:-}" ]]; then
+    echo "launch.sh: ${ESPDB_SECRET_PATH} has no ${ESPDB_USERNAME_KEY} / ${ESPDB_PASSWORD_KEY}" >&2
+    exit 1
+  fi
+  export ESPHOME_USERNAME="${!ESPDB_USERNAME_KEY}"
+  export ESPHOME_PASSWORD="${!ESPDB_PASSWORD_KEY}"
+  unset "${ESPDB_USERNAME_KEY}" "${ESPDB_PASSWORD_KEY}"
+fi
+
 cd "${SCRIPT_DIR}"
 exec docker compose up -d --build
